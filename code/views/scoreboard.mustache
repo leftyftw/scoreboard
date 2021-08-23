@@ -1,0 +1,143 @@
+<html>
+    <head>
+        <style>
+
+            body {
+                background: #f00;
+            }
+
+            .logo {
+                float: left;
+            }
+
+            .logo img {
+                height: 50px;
+                width: 50px;
+            }
+
+            tr.scores {
+                height: 1.5em;
+            }
+
+            .playername {
+                padding-left: 10px;
+                min-width: 150px;
+                height: 1.5em;
+            }
+            .score {
+                max-width: 30px;
+                min-width: 30px;
+                width: 30px;
+                text-align: right;
+                padding-right: 10px;
+            }
+
+            [name={{server}}] {
+                font-weight: bold;
+            }
+
+            .scoreboard {
+                float: left;
+            }
+            table {
+                border: 1px solid;
+                border-color:  rgb(33, 146, 221);
+                background-color:  rgb(33, 146, 221);
+                border-spacing: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="logo">
+            <img src="/scoreboard/public/logos/{{logo}}.png" />
+        </div>
+        <div class="scoreboard">
+            <table>
+                <tr class="scores" name="player1">                
+                    <td class="playername" name="name">{{player1.name}}</td>
+                    <td class="score" name="score1">{{player1.score1}}</td>
+                    <td class="score" name="score2">{{player1.score2}}</td>
+                    <td class="score" name="score3">{{player1.score3}}</td>
+                </tr>
+                <tr class="scores" name="player2">
+                    <td class="playername" name="name">{{player2.name}}</td>
+                    <td class="score" name="score1">{{player2.score1}}</td>
+                    <td class="score" name="score2">{{player2.score2}}</td>
+                    <td class="score" name="score3">{{player2.score3}}</td>
+                </tr>
+            </table>
+        </div>
+    </body>
+
+    <script>
+    document.addEventListener("keydown", keyDownHandler, false);
+    const refreshTimer = setInterval(() => {
+        location.reload();
+    }, 2000);
+
+    if ("{{player1.name}}" === "" || "{{player2.name}}" === "") {
+        configureGame();
+    }
+
+    async function configureGame() {
+        clearInterval(refreshTimer);
+        const endpoint = '/scoreboard/api/game/{{id}}';
+        const p1 = window.prompt('Player 1 name');
+        const p2 = window.prompt('Player 2 name');
+        payload = { player1: { name: p1, score1: 0, score2: 0, score3: 0 }, player2: { name: p2, score1: 0, score2: 0, score3: 0 }, game: 1 };
+        callback(endpoint, payload);
+    }
+
+    async function callback(endpoint, payload) {
+        const response = await fetch(endpoint, {
+            method: "POST", 
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)});
+        response.json().then(data => {
+            location.reload();
+        });
+    }
+
+    function keyDownHandler(e) {
+
+        let payload;
+
+        let endpoint = '/scoreboard/api/game/{{id}}';
+        switch(e.key) {
+            case 'n':
+              location.href = "/scoreboard/";
+              return;
+            case 's': 
+              payload = { server: ("{{server}}" === "player1") ? "player2": "player1"  };
+              break;
+            case 'p': 
+              endpoint = '/scoreboard/api/game/{{id}}/point';
+              payload = {
+                server: "{{server}}",
+                game: {{game}},
+                points: 1
+              };
+              break;
+            case 'o': 
+              endpoint = '/scoreboard/api/game/{{id}}/point';
+              payload = {
+                server: "{{server}}",
+                game: {{game}},
+                points: -1
+              };
+              break;
+            case 'g':
+              payload = { game: ({{game}} + 1)}
+              break;
+            default:
+              return;
+        }
+
+        callback(endpoint, payload);
+            
+    }
+    </script>
+</html>

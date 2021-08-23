@@ -1,0 +1,7 @@
+FROM node:12
+RUN apt-get update && apt-get -y install zip
+VOLUME [ "/app/gameinfo"  ]
+COPY code /app
+WORKDIR /app
+RUN npm ci --production
+ENTRYPOINT ["npm", "start"]

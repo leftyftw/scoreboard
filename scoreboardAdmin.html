@@ -1,0 +1,141 @@
+<html>
+    <head>
+        <style>
+
+            input:focus {
+                outline: none;
+            }
+
+            body {
+                background: #f00;
+            }
+
+            .logo {
+                float: left;
+            }
+
+            .logo img {
+                height: 50px;
+            }
+
+            tr.scores {
+                height: 1.5em;
+            }
+
+            .scores, .scores input {
+                background-color: rgb(33, 146, 221);
+            }
+
+            .scores input {
+                border: none;
+
+            }
+
+            .score, .score input {
+                max-width: 30px;
+            }
+
+            .scoreboard {
+                float: left;
+            }
+            table {
+                border: 1px solid;
+                border-color:  rgb(33, 146, 221);
+                border-spacing: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="logo">
+            <img src="cvra_logo.png" />
+        </div>
+        <div class="scoreboard">
+            <table>
+                <tr class="scores" name="player1">                
+                    <td class="playername" name="name"><input/></td>
+                    <td class="score" name="score1"><input/></td>
+                    <td class="score" name="score2"><input/></td>
+                    <td class="score" name="score3"><input/></td>
+                </tr>
+                <tr class="scores" name="player2">
+                    <td class="playername" name="name"><input/></td>
+                    <td class="score" name="score1"><input/></td>
+                    <td class="score" name="score2"><input/></td>
+                    <td class="score" name="score3"><input/></td>
+                </tr>
+            </table>
+        </div>
+        <script>
+
+            (()=> {
+                restoreScoreboard();
+
+                const inputs = document.getElementsByTagName("input");
+                for(let i = 0; i < inputs.length; i++) {
+                    inputs[i].addEventListener('keyup', pullScoreboard);
+                }
+            })();
+            
+            function getCellValue(root, elementName) {
+                return root.querySelector(`td[name='${elementName}']`).children[0].value;
+            }
+
+            function setCellValue(root, elementName, value) {
+                root.querySelector(`td[name='${elementName}']`).children[0].value = value;
+            }
+
+            function restorePlayer(idx, player) {
+                if (!player) {
+                    return;
+                }
+
+                const row = document.querySelector(`tr[name='player${idx}']`);
+                setCellValue(row, "name", player.name);
+                setCellValue(row, "score1", player.score1);
+                setCellValue(row, "score2", player.score2);
+                setCellValue(row, "score3", player.score3);
+            }
+
+            function updatePlayer(player, idx) {
+                const row = document.querySelector(`tr[name='player${idx}']`);
+                player.name = getCellValue(row, "name");
+                player.score1 = getCellValue(row, "score1");
+                player.score2 = getCellValue(row, "score2");
+                player.score3 = getCellValue(row, "score3");
+            }
+
+            function restoreScoreboard() {
+                try {
+                    const scoreboard = JSON.parse(localStorage.scoreboard);
+                    if (scoreboard) {
+                        restorePlayer(1, scoreboard.player1);
+                        restorePlayer(2, scoreboard.player2);
+                    }
+                } catch (e) {}
+            }
+
+            function pullScoreboard() {
+                const scoreboard = {
+                    player1: {
+                        name: "",
+                        score1: 0,
+                        score2: 0,
+                        score3: 0
+                    },
+
+                    player2: {
+                        name: "",
+                        score1: 0,
+                        score2: 0,
+                        score3: 0
+                    }
+                }
+
+                updatePlayer(scoreboard.player1, 1);
+                updatePlayer(scoreboard.player2, 2);
+
+                localStorage.scoreboard = JSON.stringify(scoreboard);
+            }
+        </script>
+    </body>
+</html>
