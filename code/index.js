@@ -13,22 +13,57 @@ app.engine('mustache', mustacheExpress());
 
 app.use(bodyParser.json())
 
+const defaultGameType = "usar";
+
+const defaultGameConfig = {
+    maxScore: 15,
+    timeouts: 3,
+    timeoutLength: 30,
+    technicals: 2,
+    appeals: 3
+};
+
+const defaultTieBreakerGameConfig = {
+    maxScore: 11,
+    timeouts: 2,
+    timeoutLength: 30,
+    technicals: 2,
+    appeals: 2
+};
+
+const gameConfig = {
+    usar: [
+        defaultGameConfig,
+        defaultGameConfig,
+        defaultTieBreakerGameConfig
+    ]
+};
+
 const blankGame = {
     id: 0,
     logo: "cvra",
     player1: {
         name: "",
+        timeoutsRemaining: 0,
+        appealsRemaining: 0,
+        technicals: 0,
         score1: 0,
         score2: 0,
-        score3: 0
+        score3: 0,
+        score4: 0,
+        score5: 0
     },
 
     player2: {
         name: "",
         score1: 0,
         score2: 0,
-        score3: 0
+        score3: 0,
+        score4: 0,
+        score5: 0
     },
+
+    config: defaultGameType,
     server: "player1",
     game: 1
 };
@@ -103,14 +138,38 @@ router.post('/api/game/:id', (req, res) => {
     res.json(newGameInfo);
   });
 
+  router.post('/api/game/:id/game', (req, res) => {
+    const gameInfo = getGame(req.params.id);
+    
+    gameInfo.game += 1;
+    const gameSetting = gameConfig[gameInfo.config || "usar"][gameInfo.game - 1];
+    gameInfo.player1.timeoutsRemaining = gameSetting.timeouts;
+    gameInfo.player1.appealsRemaining = gameSetting.appeals;
+    gameInfo.player1.technicals = 0;
+
+    gameInfo.player2.timeoutsRemaining = gameSetting.timeouts;
+    gameInfo.player2.appealsRemaining = gameSetting.appeals;
+    gameInfo.player2.technicals = 0;
+
+    updateGame(req.params.id, gameInfo);
+
+    res.json(gameInfo);
+  });
+
   router.post('/api/game/:id/point', (req, res) => {
     const gameInfo = getGame(req.params.id);
 
     const pointInfo = req.body;
 
-    gameInfo[pointInfo.server][`score${pointInfo.game}`] += pointInfo.points;
-    if (gameInfo[pointInfo.server][`score${pointInfo.game}`] > 15) gameInfo[pointInfo.server][`score${pointInfo.game}`] = 15;
-    if (gameInfo[pointInfo.server][`score${pointInfo.game}`] < 0) gameInfo[pointInfo.server][`score${pointInfo.game}`] = 0;
+    gameInfo[pointInfo.server][`score${gameInfo.game}`] += pointInfo.points;
+    const gameSetting = gameConfig[gameInfo.config || "usar"][gameInfo.game - 1];
+
+    const minPoints = 0;
+    const maxPoints = gameSetting.maxScore;
+
+    if (gameInfo[pointInfo.server][`score${gameInfo.game}`] < 0) gameInfo[pointInfo.server][`score${gameInfo.game}`] = 0;
+
+    if (gameInfo[pointInfo.server][`score${gameInfo.game}`] > maxPoints) gameInfo[pointInfo.server][`score${gameInfo.game}`] = maxPoints;
 
     const newGameInfo = updateGame(req.params.id, gameInfo); 
     console.log("POST", req.body)

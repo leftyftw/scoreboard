@@ -54,12 +54,16 @@
                     <td class="score" name="score1">{{player1.score1}}</td>
                     <td class="score" name="score2">{{player1.score2}}</td>
                     <td class="score" name="score3">{{player1.score3}}</td>
+                    <td class="score" name="score4">{{player2.score4}}</td>
+                    <td class="score" name="score5">{{player2.score5}}</td>
                 </tr>
                 <tr class="scores" name="player2">
                     <td class="playername" name="name">{{player2.name}}</td>
                     <td class="score" name="score1">{{player2.score1}}</td>
                     <td class="score" name="score2">{{player2.score2}}</td>
                     <td class="score" name="score3">{{player2.score3}}</td>
+                    <td class="score" name="score4">{{player2.score4}}</td>
+                    <td class="score" name="score5">{{player2.score5}}</td>
                 </tr>
             </table>
         </div>
@@ -67,21 +71,66 @@
 
     <script>
     document.addEventListener("keydown", keyDownHandler, false);
-    const refreshTimer = setInterval(() => {
-        location.reload();
-    }, 2000);
+    let refreshTimer;
+    
+    function configureTimer() {
+        setInterval(() => {
+            loadData('{{id}}');
+        }, 1000);
+    }
+
+    configureTimer();
+
 
     if ("{{player1.name}}" === "" || "{{player2.name}}" === "") {
         configureGame();
     }
 
     async function configureGame() {
-        clearInterval(refreshTimer);
         const endpoint = '/scoreboard/api/game/{{id}}';
         const p1 = window.prompt('Player 1 name');
         const p2 = window.prompt('Player 2 name');
         payload = { player1: { name: p1, score1: 0, score2: 0, score3: 0 }, player2: { name: p2, score1: 0, score2: 0, score3: 0 }, game: 1 };
         callback(endpoint, payload);
+    }
+
+    async function loadData(gameId) {
+        const GET_gameIdEndpoint = `/scoreboard/api/game/${gameId}`;
+        const response = await fetch(GET_gameIdEndpoint);
+        const gameData = await response.json();
+        updateDataView(gameData);
+    }
+
+    function getChildElement(node, elementName) {
+        return node.querySelector(`td[name='${elementName}']`);
+    }
+
+    async function updateDataView(scoreInfo) {
+        let p1Node = document.getElementsByName("player1")[0];
+        let p2Node = document.getElementsByName("player2")[0];
+
+        const updatePlayerInfo = (player, node) => {
+            getChildElement(node, "name").textContent = player.name;
+
+            for (let i = 1; i <= 5; i++) {
+                const gametd = getChildElement(node, `score${i}`);
+                gametd.textContent = player[`score${i}`];
+                if (i > 0) {
+                    gametd.hidden = scoreInfo.game < i;
+                }
+            }
+        };
+
+        updatePlayerInfo(scoreInfo.player1, p1Node);
+        updatePlayerInfo(scoreInfo.player2, p2Node);
+        serverState = scoreInfo.server;
+        if (serverState === "player1") {
+            p1Node.style.fontWeight = "bold"
+            p2Node.style.fontWeight = "normal"
+        } else {
+            p1Node.style.fontWeight = "normal"
+            p2Node.style.fontWeight = "bold"
+        }
     }
 
     async function callback(endpoint, payload) {
@@ -93,9 +142,11 @@
             },
             body: JSON.stringify(payload)});
         response.json().then(data => {
-            location.reload();
+            loadData('{{id}}');
         });
     }
+
+    let serverState = "{{server}}";
 
     function keyDownHandler(e) {
 
@@ -107,26 +158,25 @@
               location.href = "/scoreboard/";
               return;
             case 's': 
-              payload = { server: ("{{server}}" === "player1") ? "player2": "player1"  };
+              payload = { server: (serverState === "player1") ? "player2": "player1"  };
               break;
             case 'p': 
               endpoint = '/scoreboard/api/game/{{id}}/point';
               payload = {
-                server: "{{server}}",
-                game: {{game}},
+                server: serverState,
                 points: 1
               };
               break;
             case 'o': 
               endpoint = '/scoreboard/api/game/{{id}}/point';
               payload = {
-                server: "{{server}}",
-                game: {{game}},
+                server: serverState,
                 points: -1
               };
               break;
             case 'g':
-              payload = { game: ({{game}} + 1)}
+              endpoint = '/scoreboard/api/game/{{id}}/game';
+              payload = {}
               break;
             default:
               return;
