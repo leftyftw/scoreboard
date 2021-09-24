@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <title>
+            {{event.name}}
+        </title>
+        <style>
+            .logo {
+                display: inline-block;
+            }
+
+            .logo img {
+                height: 50px;
+                width: 50px;
+            }
+
+            tr.scores {
+                height: 1.5em;
+            }
+
+            .playername {
+                padding-left: 10px;
+                min-width: 150px;
+                height: 1.5em;
+            }
+            .score {
+                max-width: 30px;
+                min-width: 30px;
+                width: 30px;
+                text-align: right;
+                padding-right: 10px;
+            }
+
+            [name={{server}}] {
+                font-weight: bold;
+            }
+
+            .scoreboard {
+                display: inline-block;
+            }
+
+            .links {
+                display: inline-block;
+            }
+
+            table {
+                border: 1px solid;
+                border-color:  rgb(33, 146, 221);
+                background-color:  rgb(33, 146, 221);
+                border-spacing: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>{{event.name}}</h1>
+        <a href="https://www.r2sports.com/website/event-website.asp?TID={{event.eventId}}">R2 Sports Page</a>
+        <button onclick="newMatch()">New Match</button>
+        {{#games}}
+        <div>
+            <div class="logo">
+                <img src="/scoreboard/public/logos/{{logo}}.png" />
+            </div>
+            <div class="scoreboard">
+                <table>
+                    <tr class="scores" name="player1">                
+                        <td class="playername" name="name">{{player1.name}}</td>
+                        <td class="score" name="score1">{{player1.score1}}</td>
+                        <td class="score" name="score2">{{player1.score2}}</td>
+                        <td class="score" name="score3">{{player1.score3}}</td>
+                        <td class="score" name="score4">{{player2.score4}}</td>
+                        <td class="score" name="score5">{{player2.score5}}</td>
+                    </tr>
+                    <tr class="scores" name="player2">
+                        <td class="playername" name="name">{{player2.name}}</td>
+                        <td class="score" name="score1">{{player2.score1}}</td>
+                        <td class="score" name="score2">{{player2.score2}}</td>
+                        <td class="score" name="score3">{{player2.score3}}</td>
+                        <td class="score" name="score4">{{player2.score4}}</td>
+                        <td class="score" name="score5">{{player2.score5}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="links">
+                <a href="/scoreboard/cast/{{id}}" title="Cast Link">CAST</a> | 
+                <a href="/scoreboard/game/{{id}}" title="Referee Link">EDIT</a>
+            </div>
+        </div>
+        {{/games}}
+    </body>
+    <script>
+    function newMatch() {
+        location.href="/scoreboard/newMatch/{{event.eventId}}";
+    }
+    </script>
+</html>

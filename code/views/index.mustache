@@ -1,0 +1,76 @@
+<html>
+    <head>
+        <style>
+            .logo {
+                display: inline-block;
+            }
+
+            .logo img {
+                height: 50px;
+                width: 50px;
+            }
+
+            tr.scores {
+                height: 1.5em;
+            }
+
+            .playername {
+                padding-left: 10px;
+                min-width: 150px;
+                height: 1.5em;
+            }
+            .score {
+                max-width: 30px;
+                min-width: 30px;
+                width: 30px;
+                text-align: right;
+                padding-right: 10px;
+            }
+
+            [name={{server}}] {
+                font-weight: bold;
+            }
+
+            .scoreboard {
+                display: inline-block;
+            }
+
+            table {
+                border: 1px solid;
+                border-color:  rgb(33, 146, 221);
+                background-color:  rgb(33, 146, 221);
+                border-spacing: 0;
+            }
+        </style>
+    </head>
+    <body>
+
+        <button onclick="newEvent()">New Event</button>
+        {{#events}}
+            <div>
+                <h1>{{name}}</h1>
+                <a href="https://www.r2sports.com/website/event-website.asp?TID={{eventId}}">R2 Sports Page</a>
+                <a href="/scoreboard/event/{{eventId}}">View Games</a> ({{gameCount}} total)
+            </div>
+        {{/events}}
+    </body>
+
+    <script>
+        async function newEvent() {
+            const name = prompt('Event Name');
+            const eventId = prompt('R2 Sports Id');
+
+            const response = await fetch(`/scoreboard/api/event/${eventId}`, {
+            method: "POST", 
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+                body: JSON.stringify({name})});
+            response.json().then(data => {
+                location.reload();
+            });
+
+        }
+    </script>
+</html>

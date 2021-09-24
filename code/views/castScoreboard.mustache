@@ -35,16 +35,6 @@
                 display: inline-block;
             }
 
-            div.controls {
-                width: 100vw;
-
-            }
-
-            .controls > button {
-                width: 100%;
-                height: 3em;
-            }
-
             table {
                 border: 1px solid;
                 border-color:  rgb(33, 146, 221);
@@ -56,9 +46,7 @@
     <body>
         <div>
             <div class="logo">
-                <a href="/scoreboard/cast/{{id}}" title="Cast Link">
-                    <img src="/scoreboard/public/logos/{{logo}}.png" />
-                </a>
+                <img src="/scoreboard/public/logos/{{logo}}.png" />
             </div>
             <div class="scoreboard">
                 <table>
@@ -81,32 +69,9 @@
                 </table>
             </div>
         </div>
-
-        <div class="controls">
-            <button class="changeServer" onclick="changeServer()">Server</button>
-            <hr />
-            <button class="addPoint" onclick="addPoint()">+1 Point</button>
-            <button class="deductPoint" onclick="deductPoint()">-1 Point</button>
-<!--             
-            <hr />
-            <button class="player1Timeout">{{player1.name}} Timeout</button>
-            <button class="player2Timeout">{{player2.name}} Timeout</button>
-            <hr />
-            <button class="player1Appeal">{{player1.name}} Appeal</button>
-            <button class="player2Appeal">{{player2.name}} Appeal</button>
-            <hr />
-            <button class="player1Technical">{{player1.name}} Tech</button>
-            <button class="player2Technical">{{player2.name}} Tech</button> 
--->
-            <hr />
-            <button class="newGame" onclick="newGame()">New Game</button>
-            <hr />
-            <button class="home" onclick="home()">Go to Event Home</button>
-        </div>
     </body>
 
     <script>
-    document.addEventListener("keydown", keyDownHandler, false);
     let refreshTimer;
     
     function configureTimer() {
@@ -116,7 +81,6 @@
     }
 
     configureTimer();
-
 
     if ("{{player1.name}}" === "" || "{{player2.name}}" === "") {
         configureGame();
@@ -146,7 +110,6 @@
         let p2Node = document.getElementsByName("player2")[0];
 
         const updatePlayerInfo = (player, node) => {
-            getChildElement(node, "name").textContent = player.name;
 
             for (let i = 1; i <= 5; i++) {
                 const gametd = getChildElement(node, `score${i}`);
@@ -159,7 +122,6 @@
 
         updatePlayerInfo(scoreInfo.player1, p1Node);
         updatePlayerInfo(scoreInfo.player2, p2Node);
-
         serverState = scoreInfo.server;
         if (serverState === "player1") {
             p1Node.style.fontWeight = "bold"
@@ -168,78 +130,6 @@
             p1Node.style.fontWeight = "normal"
             p2Node.style.fontWeight = "bold"
         }
-    }
-
-    async function callback(endpoint, payload) {
-        const response = await fetch(endpoint, {
-            method: "POST", 
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)});
-        response.json().then(data => {
-            loadData('{{id}}');
-        });
-    }
-
-    let serverState = "{{server}}";
-
-    function home() {
-        location.href = "/scoreboard/event/{{eventId}}";
-    }
-
-    function changeServer() {
-        const endpoint = '/scoreboard/api/game/{{id}}';
-        const payload = { server: (serverState === "player1") ? "player2": "player1"  };
-        callback(endpoint, payload);
-    }
-
-    function addPoint() {
-        const endpoint = '/scoreboard/api/game/{{id}}/point';
-        const payload = {
-            server: serverState,
-            points: 1
-        };
-        callback(endpoint, payload);
-    }
-
-    function deductPoint() {
-        const endpoint = '/scoreboard/api/game/{{id}}/point';
-        const payload = {
-            server: serverState,
-            points: -1
-        };
-        callback(endpoint, payload);
-
-    }
-
-    function newGame() {
-        const endpoint = '/scoreboard/api/game/{{id}}/game';
-        const payload = {};
-        callback(endpoint, payload);
-    }
-
-    function keyDownHandler(e) {
-        switch(e.key) {
-            case 'h':
-              home();
-              return;
-            case 's': 
-              changeServer();
-              break;
-            case 'p': 
-              addPoint();
-              break;
-            case 'o': 
-              deductPoint();
-              break;
-            case 'g':
-              newGame();
-              break;
-            default:
-              return;
-        }            
     }
     </script>
 </html>
