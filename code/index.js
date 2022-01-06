@@ -36,6 +36,13 @@ const gameConfig = {
         defaultGameConfig,
         defaultGameConfig,
         defaultTieBreakerGameConfig
+    ],
+    manilla: [
+        defaultTieBreakerGameConfig,
+        defaultTieBreakerGameConfig,
+        defaultTieBreakerGameConfig,
+        defaultTieBreakerGameConfig,
+        defaultTieBreakerGameConfig
     ]
 };
 
@@ -146,8 +153,18 @@ router.get('/api/events', (req, res) => {
 router.post('/api/event/:eventId', (req, res) => {
     const newEvent = {
         name: req.body.name,
-        eventId: +req.params.eventId
+        config: req.body.config,
+        logo: req.body.logo,
+        eventId: +req.params.eventId,
     };
+
+    if (newEvent.logo !== "cvra" && newEvent.logo !== "manilla") {
+        newEvent.logo = "cvra";
+    }
+
+    if (newEvent.config !== "usar" && newEvent.config !== "manilla") {
+        newEvent.config = "usar";
+    }
 
     console.log(`POST /api/event/${req.params.eventId}`, req.body)
 
@@ -194,6 +211,9 @@ router.get('/newMatch/:eventId', (req, res) => {
     const newId = uuidv4();
     const gameInfo = getGame(newId);
     gameInfo.eventId = +req.params.eventId;
+    const event = state.events[gameInfo.eventId];
+    gameInfo.config = event.config || defaultGameType;
+    gameInfo.logo = event.logo || gameInfo.logo;
     updateGame(newId, gameInfo);
     res.redirect(`/scoreboard/game/${newId}`);
 });
@@ -254,7 +274,7 @@ router.post('/api/game/:id/point', (req, res) => {
     const minPoints = 0;
     const maxPoints = gameSetting.maxScore;
 
-    if (gameInfo[pointInfo.server][`score${gameInfo.game}`] < 0) gameInfo[pointInfo.server][`score${gameInfo.game}`] = 0;
+    if (gameInfo[pointInfo.server][`score${gameInfo.game}`] < -5) gameInfo[pointInfo.server][`score${gameInfo.game}`] = 0;
 
     if (gameInfo[pointInfo.server][`score${gameInfo.game}`] > maxPoints) gameInfo[pointInfo.server][`score${gameInfo.game}`] = maxPoints;
 

@@ -47,8 +47,8 @@
 
             table {
                 border: 1px solid;
-                border-color:  rgb(33, 146, 221);
-                background-color:  rgb(33, 146, 221);
+                border-color:  goldenrod;
+                background-color:  gold;
                 border-spacing: 0;
             }
         </style>
@@ -126,7 +126,7 @@
         const endpoint = '/scoreboard/api/game/{{id}}';
         const p1 = window.prompt('Player 1 name');
         const p2 = window.prompt('Player 2 name');
-        payload = { player1: { name: p1, score1: 0, score2: 0, score3: 0 }, player2: { name: p2, score1: 0, score2: 0, score3: 0 }, game: 1 };
+        payload = { player1: { name: p1, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0 }, player2: { name: p2, score1: 0, score2: 0, score3: 0, score4: 0, score5: 0 }, game: 1 };
         callback(endpoint, payload);
     }
 

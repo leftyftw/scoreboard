@@ -59,6 +59,8 @@
         async function newEvent() {
             const name = prompt('Event Name');
             const eventId = prompt('R2 Sports Id');
+            const config = prompt('Scoring? usar/manilla', "usar");
+            const logo = prompt('Logo? cvra/manilla', 'cvra');
 
             const response = await fetch(`/scoreboard/api/event/${eventId}`, {
             method: "POST", 
@@ -66,7 +68,7 @@
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-                body: JSON.stringify({name})});
+                body: JSON.stringify({name, config, logo})});
             response.json().then(data => {
                 location.reload();
             });
