@@ -158,11 +158,13 @@ router.post('/api/event/:eventId', (req, res) => {
         eventId: +req.params.eventId,
     };
 
-    if (newEvent.logo !== "cvra" && newEvent.logo !== "manilla") {
+    if (!fs.existsSync(`public/logos/${newEvent.logo}.png`)) {
+        console.log(`Invalid logo defined: ${newEVent.logo}`);
         newEvent.logo = "cvra";
     }
 
-    if (newEvent.config !== "usar" && newEvent.config !== "manilla") {
+    if (!gameConfig[newEvent.config]) {
+        console.log(`Invalid game config defined: ${newEVent.config}`);
         newEvent.config = "usar";
     }
 
@@ -218,18 +220,31 @@ router.get('/newMatch/:eventId', (req, res) => {
     res.redirect(`/scoreboard/game/${newId}`);
 });
 
+function enrichGameInfo(gameInfo) {
+    if (gameInfo.logo === "manilla") {
+        gameInfo.borderColor = "goldenrod";
+        gameInfo.backgroundColor = "gold";
+    } else {
+        gameInfo.borderColor = "darkblue";
+        gameInfo.backgroundColor = "lightblue";
+    }
+}
+
 router.get('/game/:id', (req, res) => {
     const gameInfo = getGame(req.params.id);
+    enrichGameInfo(gameInfo);
     res.render('scoreboard', gameInfo);
 });
 
 router.get('/cast/:id', (req, res) => {
     const gameInfo = getGame(req.params.id);
+    enrichGameInfo(gameInfo);
     res.render('castScoreboard', gameInfo);
 });
 
 router.get('/api/game/:id', (req, res) => {
   const gameInfo = getGame(req.params.id);
+  enrichGameInfo(gameInfo);
   res.json(gameInfo);
 });
 

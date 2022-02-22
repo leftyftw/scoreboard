@@ -30,10 +30,6 @@
                 padding-right: 10px;
             }
 
-            [name={{server}}] {
-                font-weight: bold;
-            }
-
             .scoreboard {
                 display: inline-block;
             }
@@ -66,8 +62,8 @@
 
             table {
                 border: 1px solid;
-                border-color:  goldenrod;
-                background-color:  gold;
+                border-color:  {{ borderColor }};
+                background-color: {{ backgroundColor }};
                 border-spacing: 0;
             }
         </style>
@@ -180,12 +176,15 @@
         updatePlayerInfo(scoreInfo.player2, p2Node);
 
         serverState = scoreInfo.server;
+        
+        p1NameNode = p1Node.querySelector(`td[name='name']`);
+        p2NameNode = p2Node.querySelector(`td[name='name']`);
         if (serverState === "player1") {
-            p1Node.style.fontWeight = "bold"
-            p2Node.style.fontWeight = "normal"
+            p1NameNode.style.fontWeight = "bold"
+            p2NameNode.style.fontWeight = "normal"
         } else {
-            p1Node.style.fontWeight = "normal"
-            p2Node.style.fontWeight = "bold"
+            p1NameNode.style.fontWeight = "normal"
+            p2NameNode.style.fontWeight = "bold"
         }
     }
 
