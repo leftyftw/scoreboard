@@ -1,7 +1,7 @@
-FROM node:12
+FROM node:18
 RUN apt-get update && apt-get -y install zip
-VOLUME [ "/app/gameinfo"  ]
+# VOLUME [ "/app/gameinfo"  ]
 COPY code /app
 WORKDIR /app
 RUN npm ci --production
-ENTRYPOINT ["npm", "start"]
+ENTRYPOINT ["npm", "start"] 
