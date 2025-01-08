@@ -100,9 +100,11 @@ const gameSaver = setInterval(() => {
 }, 5*60*1000);
 
 function restoreGameState() {
+    console.log('Restoring game state');
     try {
         const data = fs.readFileSync(gameStateFile);
         state = JSON.parse(data);
+        console.log(`Restored ${Object.keys(state.events).length} events`);
     } catch (e) {
         console.log('Error restoring game state', e);
     }
