@@ -298,6 +298,10 @@ router.post('/api/game/:id/point', (req, res) => {
     res.json(newGameInfo);
 });
 
+router.get('/health', (req, res) => {
+    res.send('healthy');
+});
+
 app.use('/scoreboard', router);
 app.use('/scoreboard/public', express.static('public'));
 restoreGameState();
